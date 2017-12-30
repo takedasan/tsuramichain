@@ -5,9 +5,13 @@ import jp.takeda.tsuramichain.domain.model.Transaction
 import jp.takeda.tsuramichain.domain.repository.Blockchain
 import jp.takeda.tsuramichain.domain.repository.TransactionCache
 import org.apache.commons.codec.digest.DigestUtils
+import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import java.time.ZoneId
+
 
 @Service
 class BlockchainService {
@@ -16,8 +20,10 @@ class BlockchainService {
 
     private var transactionCache: TransactionCache = TransactionCache()
 
+    private var nodeSet: MutableSet<String> = mutableSetOf()
+
     init {
-        this.createBlock("1",100)
+        this.createBlock("1", 100)
     }
 
     fun createBlock(previousHash: String, proof: Long): Block {
@@ -68,8 +74,69 @@ class BlockchainService {
         return proof
     }
 
+    fun getFullChain(): List<Block> {
+        return this.blockchain.chain
+    }
+
     fun getLastProof(): Long {
         return this.blockchain.chain.last().proof
+    }
+
+    fun registerNode(address: String) {
+        this.nodeSet.add(address)
+    }
+
+    fun resoleveConflicts(): Boolean {
+        val otherNodeList = this.nodeSet.toList()
+        var maxLength = this.blockchain.chain.size
+        var newChain = Blockchain()
+
+        val restTemplate = RestTemplate()
+        for (node in otherNodeList) {
+            val blockList = restTemplate.exchange("http://${node}/chain", HttpMethod.GET, null, object : ParameterizedTypeReference<List<Block>>() {
+            }).body
+
+            val length = blockList.size
+            if (length > maxLength && this.validChain(blockList)) {
+                maxLength = length
+
+                newChain.chain.clear()
+                newChain.chain.addAll(blockList)
+            }
+        }
+
+        // replace chain
+        if (!newChain.chain.isEmpty()) {
+            this.blockchain.chain.clear()
+            this.blockchain.chain.addAll(newChain.chain)
+
+            return true
+        }
+
+        return false
+    }
+
+    private fun validChain(blockList: List<Block>): Boolean {
+        var lastBlock = blockList.get(0)
+        var currentIndex = 1
+
+        while (currentIndex > blockList.size) {
+            val block = blockList.get(currentIndex)
+
+            if (block.previousHash != this.calculateHash(lastBlock)) {
+                return false
+            }
+
+            if (!this.validProof(lastBlock.proof, block.proof)) {
+                return false
+            }
+
+            // update parameter
+            lastBlock = block
+            currentIndex += 1
+        }
+
+        return true
     }
 
     private fun validProof(lastProof: Long, proof: Long): Boolean {

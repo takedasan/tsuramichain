@@ -1,4 +1,4 @@
-package jp.takeda.tsuramichain.app.mine
+package jp.takeda.tsuramichain.app.node.resolve
 
 import jp.takeda.tsuramichain.domain.service.BlockchainService
 import org.springframework.beans.factory.annotation.Autowired
@@ -8,27 +8,22 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
-@RequestMapping("mine")
-class NewBlockController {
+@RequestMapping("node/resolve")
+class ResolveController {
 
     @Autowired
     lateinit var service: BlockchainService
 
-    val uuid = UUID.randomUUID().toString()
-
     @RequestMapping(method = arrayOf(RequestMethod.GET))
-    fun mine(model: Model): ResponseEntity<String> {
-        val lastProof = this.service.getLastProof()
-        val proof = this.service.proofOfWork(lastProof)
+    fun resolve(model: Model): ResponseEntity<String> {
+        val isReplaced = this.service.resoleveConflicts()
 
-        // reward to miner
-        this.service.createTransaction("0", uuid, 1)
-        this.service.createBlodk(proof)
-
-        return ResponseEntity(HttpStatus.OK);
+        if (isReplaced) {
+            return ResponseEntity("replaced", HttpStatus.OK);
+        } else {
+            return ResponseEntity("not replaced", HttpStatus.OK);
+        }
     }
-
 }
