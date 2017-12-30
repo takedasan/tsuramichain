@@ -38,5 +38,9 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}")
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     compile group: 'commons-codec', name: 'commons-codec', version: '1.5'
+    compile ('org.webjars.npm:axios:0.17.1')
+    compile ('org.webjars:vue:2.5.3-1')
+    compile ('org.webjars.npm:element-ui:2.0.8')
+    compile ('org.webjars:momentjs:2.20.1')
     testCompile('org.springframework.boot:spring-boot-starter-test')
 }

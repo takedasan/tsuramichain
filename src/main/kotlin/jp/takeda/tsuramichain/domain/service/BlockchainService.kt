@@ -64,13 +64,12 @@ class BlockchainService {
     }
 
     fun proofOfWork(lastProof: Long): Long {
-        var proof = 0L
+        var proof = lastProof
 
         while (!this.validProof(lastProof, proof)) {
             proof += 1
         }
 
-        println("found!:" + proof)
         return proof
     }
 
@@ -84,6 +83,7 @@ class BlockchainService {
 
     fun registerNode(address: String) {
         this.nodeSet.add(address)
+        println(address)
     }
 
     fun resoleveConflicts(): Boolean {

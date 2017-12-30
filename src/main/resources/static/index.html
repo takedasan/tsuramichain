@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="webjars/vue/2.5.3-1/vue.js"></script>
+    <script src="webjars/element-ui/2.0.8/lib/index.js"></script>
+    <script src="webjars/element-ui/2.0.8/lib/umd/locale/ja.js"></script>
+    <script src="webjars/axios/0.17.1/dist/axios.js"></script>
+    <script src="webjars/momentjs/2.20.1/moment.js"></script>
+    <link rel="stylesheet" href="webjars/element-ui/2.0.8/lib/theme-chalk/index.css" />
+    <link rel="stylesheet" href="css/main.css" />
+</head>
+
+<body>
+    <div id="app">
+        <el-container>
+
+            <el-aside width="250px">
+                <el-form ref="form" :model="mineForm" label-width="60px">
+                    <el-form-item label="Mining">
+                        <el-switch v-model="mineForm.mine" active-text="on" inactive-text="off" @change="mining"></el-switch>
+                    </el-form-item>
+                    <span>Mining Log</span>
+                    <el-input type="textarea" :rows="30" v-model="mineForm.logs"></el-input>
+                </el-form>
+            </el-aside>
+
+            <el-main>
+                <el-alert v-if="ok" title="OK!" type="success" description="Regist success。" show-icon></el-alert>
+                <el-alert v-if="error" title="ERROR..." type="error" description="Regist error" show-icon></el-alert>
+                <el-form ref="form" :model="nodeForm" label-width="120px">
+                    <el-form-item label="Node">
+                        <el-input placeholder="IP:port(ex:192.168.0.1:8080)" v-model="nodeForm.nodes[0]"></el-input>
+                        <el-input placeholder="IP:port(ex:192.168.0.1:8080)" v-model="nodeForm.nodes[1]"></el-input>
+                        <el-input placeholder="IP:port(ex:192.168.0.1:8080)" v-model="nodeForm.nodes[2]"></el-input>
+                        <el-input placeholder="IP:port(ex:192.168.0.1:8080)" v-model="nodeForm.nodes[3]"></el-input>
+                        <el-input placeholder="IP:port(ex:192.168.0.1:8080)" v-model="nodeForm.nodes[4]"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button v-on:click="regist" type="primary" icon="el-icon-upload">Regist</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-main>
+
+        </el-container>
+    </div>
+
+    <script src="js/main.js"></script>
+</body>
+
+</html>
