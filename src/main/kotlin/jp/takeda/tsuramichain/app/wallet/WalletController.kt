@@ -1,25 +1,26 @@
-package jp.takeda.tsuramichain.app.node.resolve
+package jp.takeda.tsuramichain.app.wallet
 
 import jp.takeda.tsuramichain.domain.service.BlockchainService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("node/resolve")
-class ResolveController {
+@RequestMapping("wallet")
+class WalletController {
 
     @Autowired
     lateinit var service: BlockchainService
 
-    @RequestMapping(method = arrayOf(RequestMethod.GET))
-    fun resolve(model: Model): ResponseEntity<Boolean> {
-        val isReplaced = this.service.resoleveConflicts()
+    @RequestMapping(method = arrayOf(RequestMethod.POST))
+    fun getBalance(@RequestBody body: WalletForm): ResponseEntity<Long> {
+        val balance = this.service.getBalanceByUuid(body.uuid);
 
-        return ResponseEntity(isReplaced, HttpStatus.OK);
+        return ResponseEntity(balance, HttpStatus.OK);
     }
+
 }

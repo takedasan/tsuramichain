@@ -34,10 +34,9 @@ class BlockchainService {
         val zoneId = ZoneId.systemDefault();
         val timestamp = now.atZone(zoneId).toEpochSecond();
         // get transactions
-        val transactions = this.transactionCache.cache
+        val transactions = this.transactionCache.cache.toMutableList()
         // create previous hash by prevous block
         val previousHash = if (previousHash.isNullOrBlank()) this.calculateHash(this.blockchain.chain.last()) else previousHash
-
 
         val newBlock = Block(index, previousHash, timestamp, transactions, proof)
 
@@ -83,7 +82,6 @@ class BlockchainService {
 
     fun registerNode(address: String) {
         this.nodeSet.add(address)
-        println(address)
     }
 
     fun resoleveConflicts(): Boolean {
@@ -114,6 +112,28 @@ class BlockchainService {
         }
 
         return false
+    }
+
+    fun getBalanceByUuid(uuid: String): Long {
+        var balance = 0L
+
+        for (block in this.blockchain.chain) {
+            val recipientAmount = block.transactions.filter { transaction -> transaction.recipient == uuid }.sumByLong { it.amount }
+            val senderAmount = block.transactions.filter { transaction -> transaction.sender == uuid }.sumByLong { it.amount }
+
+            balance += recipientAmount - senderAmount
+        }
+
+        return balance;
+    }
+
+
+    private fun <T> Iterable<T>.sumByLong(selector: (T) -> Long): Long {
+        var sum: Long = 0L
+        for (element in this) {
+            sum += selector(element)
+        }
+        return sum
     }
 
     private fun validChain(blockList: List<Block>): Boolean {

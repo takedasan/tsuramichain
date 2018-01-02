@@ -19,6 +19,8 @@
 
             <el-aside width="250px">
                 <el-form ref="form" :model="mineForm" label-width="60px">
+                    <img src="img/coin.png" width="20px" height="20px" />
+                    <span>{{mineForm.balance}} Tsurami</span>
                     <el-form-item label="Mining">
                         <el-switch v-model="mineForm.mine" active-text="on" inactive-text="off" @change="mining"></el-switch>
                     </el-form-item>
@@ -28,7 +30,7 @@
             </el-aside>
 
             <el-main>
-                <el-alert v-if="ok" title="OK!" type="success" description="Regist success。" show-icon></el-alert>
+                <el-alert v-if="ok" title="OK!" type="success" description="New nodes have been added" show-icon></el-alert>
                 <el-alert v-if="error" title="ERROR..." type="error" description="Regist error" show-icon></el-alert>
                 <el-form ref="form" :model="nodeForm" label-width="120px">
                     <el-form-item label="Node">

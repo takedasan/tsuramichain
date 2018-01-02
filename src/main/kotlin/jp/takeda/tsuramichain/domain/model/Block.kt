@@ -1,9 +1,9 @@
 package jp.takeda.tsuramichain.domain.model
 
 data class Block(
-        val index: Long,
-        val previousHash: String,
-        val timestamp: Long,
-        val transactions: MutableList<Transaction>,
-        val proof: Long
+        var index: Long = 0L,
+        var previousHash: String = "",
+        var timestamp: Long = 0L,
+        var transactions: MutableList<Transaction> = mutableListOf(),
+        var proof: Long = 0L
 )

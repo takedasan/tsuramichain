@@ -28,7 +28,7 @@ class NewBlockController {
         this.service.createTransaction("0", uuid, 1)
         this.service.createBlodk(proof)
 
-        return ResponseEntity(HttpStatus.OK);
+        return ResponseEntity(uuid, HttpStatus.OK);
     }
 
 }

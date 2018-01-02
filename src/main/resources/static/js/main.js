@@ -8,6 +8,7 @@ var app = new Vue({
             nodes: []
         },
         mineForm: {
+            balance: 0,
             mine: false,
             logs: ''
         }
@@ -22,13 +23,37 @@ var app = new Vue({
             that.mineForm.logs = '*** Mining Start ***\n';
 
             while (that.mineForm.mine) {
-                const res = await axios.get('/mine');
+                // mining
+                const mineResponse = await axios.get('/mine');
+                var uuid = mineResponse.data;
 
-                if (res.status !== 200) {
-                    that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Error!\n' + that.mineForm.logs;
+                if (mineResponse.status !== 200) {
+                    that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Mining:Error!\n' + that.mineForm.logs;
                 } else {
-                    that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Get 1 tsurami coin\n' + that.mineForm.logs;
+                    that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Mining:Find hash!\n' + that.mineForm.logs;
                 }
+
+                // resolve chain
+                const resolveResponse = await axios.get('/node/resolve');
+
+                if(resolveResponse.status !== 200) {
+                    that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Resolve:Error!\n' + that.mineForm.logs;
+                } else {
+                    if(resolveResponse.data) {
+                        that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Resolve:Replaced\n' + that.mineForm.logs;
+                    } else {
+                        that.mineForm.logs = moment(new Date).format('HH:mm:ss') + ' Resolve:Registered\n' + that.mineForm.logs;
+                    }
+                }
+
+                // refresh wallet
+                await axios.post('/wallet', {
+                    uuid: uuid
+                }).then(response => {
+                    that.mineForm.balance = response.data;
+                }).catch(error => {
+                    that.mineForm.balance = 0;
+                });
             }
         },
         regist() {
